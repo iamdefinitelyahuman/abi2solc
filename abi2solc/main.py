@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 from copy import deepcopy
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 
 def _get_struct_map(abi_params: List[Dict], struct_map: Dict) -> None:
@@ -33,17 +33,22 @@ def generate_structs(abi: List[Dict]) -> List:
     return result
 
 
-def _format_param(param: Dict) -> str:
-    formatted = param["type"]
+def _format_param(param: Dict, location: Optional[str]) -> str:
+    type_ = param["type"]
+    formatted = type_
     if param.get("indexed"):
         formatted += " indexed"
+    if location and (
+        type_.endswith("]") or type_ in ("string", "bytes") or type_.startswith("Tuple")
+    ):
+        formatted += f" {location}"
     if param.get("name"):
         formatted += f" {param['name']}"
     return formatted
 
 
-def _format_params(abi_params: List[Dict]) -> str:
-    return f"({', '.join(_format_param(i) for i in abi_params)})"
+def _format_params(abi_params: List[Dict], location: Optional[str]) -> str:
+    return f"({', '.join(_format_param(i, location) for i in abi_params)})"
 
 
 def generate_events(abi: List[Dict]) -> List:
@@ -51,12 +56,12 @@ def generate_events(abi: List[Dict]) -> List:
 
     result = []
     for event in events_abi:
-        result.append(f"event {event['name']} {_format_params(event['inputs'])};")
+        result.append(f"event {event['name']} {_format_params(event['inputs'], None)};")
 
     return result
 
 
-def generate_functions(abi: List[Dict]) -> List:
+def generate_functions(abi: List[Dict], solc4: bool) -> List:
     fn_abi = sorted(
         [i for i in abi if i["type"] == "function"],
         key=lambda k: (k["stateMutability"], k.get("name", "")),
@@ -67,12 +72,12 @@ def generate_functions(abi: List[Dict]) -> List:
         fn_str = "function "
         if fn.get("name"):
             fn_str += f"{fn['name']} "
-        fn_str += _format_params(fn.get("inputs", []))
+        fn_str += _format_params(fn.get("inputs", []), None if solc4 else "calldata")
         fn_str += " external"
         if fn["stateMutability"] != "nonpayable":
             fn_str += f" {fn['stateMutability']}"
         if fn.get("outputs"):
-            fn_str += f" returns {_format_params(fn['outputs'])}"
+            fn_str += f" returns {_format_params(fn['outputs'], None if solc4 else 'memory')}"
         fn_str += ";"
         result.append(fn_str)
 
@@ -80,20 +85,20 @@ def generate_functions(abi: List[Dict]) -> List:
 
 
 def generate_interface(
-    abi: List[Dict], interface_name: str, legacy_support: bool = False, indent: int = 4
+    abi: List[Dict], interface_name: str, solc4: bool = False, indent: int = 4
 ) -> str:
 
     abi = deepcopy(abi)
-    interface = f"pragma solidity >={'0.4.17' if legacy_support else '0.5.0'};"
+    interface = f"pragma solidity ^{'0.4.17' if solc4 else '0.5.0'};"
     indent_str = f"\n{' ' * indent} "
 
     structs = generate_structs(abi)
     events = generate_events(abi)
-    functions = generate_functions(abi)
+    functions = generate_functions(abi, solc4)
 
     if structs:
         interface += f"\npragma experimental ABIEncoderV2;\n\n"
-        interface += f"{'contract' if legacy_support else 'interface'} {interface_name} {{"
+        interface += f"{'contract' if solc4 else 'interface'} {interface_name} {{"
     else:
         interface += f"\n\ninterface {interface_name} {{"
 
