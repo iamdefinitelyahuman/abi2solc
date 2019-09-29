@@ -3,6 +3,7 @@ coveralls==1.7.0
 isort==4.3.21
 pytest>=5.0.0
 pytest-cov>=2.7.1
+py-solc-x==0.6.0
 tox-travis==0.12
 twine==1.13.0
 wheel==0.33.4
