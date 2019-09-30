@@ -8,7 +8,7 @@ import solcx
 
 import abi2solc
 
-ABI_PATHS = list(Path(".").glob("tests/abi/*.json"))
+ABI_PATHS = list(Path("tests").glob("**/*.json"))
 SOLC_VERSIONS = ["0.4.17", "0.4.22", "0.4.25", "0.5.0", "0.5.10"]
 
 
@@ -21,6 +21,8 @@ def setup():
 @pytest.mark.parametrize("abi_path", ABI_PATHS)
 @pytest.mark.parametrize("version", SOLC_VERSIONS)
 def test_abi2solc(abi_path, version):
+    if version == "0.4.17" and abi_path.parent.stem == "tuples":
+        return
     abi = json.load(abi_path.open())
     solcx.set_solc_version(version)
     interface = abi2solc.generate_interface(abi, "Test", version.startswith("0.4"))
