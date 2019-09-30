@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="abi2solc",
-    version="0.1.0",
+    version="0.1.0",  # do not change manually! use bumpversion instead
     description="""A library for generating Solidity interfaces from ABIs.""",
     long_description=long_description,
     long_description_content_type="text/markdown",
