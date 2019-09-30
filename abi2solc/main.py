@@ -92,6 +92,19 @@ def generate_interface(
     abi: List[Dict], interface_name: str, solc4: bool = False, indent: int = 4
 ) -> str:
 
+    """
+    Generates a Solidity interface from an ABI.
+
+    Args:
+        abi: A contract ABI as a list of dicts
+        interface_name: Name to assign the generated interface
+        solc4: If True, generates an interface for solc ^0.4.17. If False, generates for ^0.5.0.
+        indent: Number of spaces to indent the interface
+
+    Returns:
+        Solidity interface as a string
+    """
+
     abi = deepcopy(abi)
     interface = f"pragma solidity ^{'0.4.17' if solc4 else '0.5.0'};"
     indent_str = f"\n{' ' * indent} "
