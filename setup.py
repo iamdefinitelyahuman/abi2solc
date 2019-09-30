@@ -6,9 +6,9 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
-    name="py-solc-ast",
+    name="abi2solc",
     version="0.1.0",
-    description="""Converts an ABI to a Solidity interface.""",
+    description="""A library for generating Solidity interfaces from ABIs.""",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="Ben Hauser",
