@@ -56,7 +56,11 @@ def generate_events(abi: List[Dict]) -> List:
 
     result = []
     for event in events_abi:
-        result.append(f"event {event['name']} {_format_params(event['inputs'], None)};")
+        event_str = f"event {event['name']} {_format_params(event['inputs'], None)}"
+        if event["anonymous"]:
+            event_str += " anonymous"
+        event_str += ";"
+        result.append(event_str)
 
     return result
 
