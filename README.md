@@ -44,9 +44,9 @@ interface ExampleInterface {
 
 ## Supported Versions
 
-By default, `abi2solc` generates interfaces compatible with Solidity `^0.5.0`. Use the `solc4=False` kwarg to instead generate interfaces for `^0.4.17`.
-
-Note that with `0.4.x` versions, if the ABI contains any tuple types `abi2solc` will return an [abstract base contract](https://solidity.readthedocs.io/en/v0.4.25/contracts.html#abstract-contracts) instead of an interface. This is because interfaces may not contain structs prior to `0.5.0`.
+* By default, `abi2solc` generates interfaces with pragma `^0.5.0`
+* With the `solc4=True` kwarg, interfaces are generated with pragma `^0.4.17`
+* If `solc4=True` and the ABI also contains tuple types, an [abstract base contract](https://solidity.readthedocs.io/en/v0.4.25/contracts.html#abstract-contracts) is generated with pragma `^0.4.22`
 
 ## Tests
 

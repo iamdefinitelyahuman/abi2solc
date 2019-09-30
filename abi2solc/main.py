@@ -106,7 +106,6 @@ def generate_interface(
     """
 
     abi = deepcopy(abi)
-    interface = f"pragma solidity ^{'0.4.17' if solc4 else '0.5.0'};"
     indent_str = f"\n{' ' * indent} "
 
     structs = generate_structs(abi)
@@ -114,9 +113,11 @@ def generate_interface(
     functions = generate_functions(abi, solc4)
 
     if structs:
+        interface = f"pragma solidity ^{'0.4.22' if solc4 else '0.5.0'};"
         interface += f"\npragma experimental ABIEncoderV2;\n\n"
         interface += f"{'contract' if solc4 else 'interface'} {interface_name} {{"
     else:
+        interface = f"pragma solidity ^{'0.4.17' if solc4 else '0.5.0'};"
         interface += f"\n\ninterface {interface_name} {{"
 
     for content in [i for i in (structs, events, functions) if i]:
